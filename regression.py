@@ -2,12 +2,7 @@ import tensorflow as tf
 import numpy as np
 import random
 
-def CNN(features_train, labels_train, features_val, labels_val):
-	
-	print(len(features_train))
-	print(len(features_val))
-	print(len(labels_train))
-	print(len(labels_val))
+def CNN(features_train, labels_train, features_val, labels_val, features_test):
 	
 	sess = tf.InteractiveSession()
 
@@ -40,7 +35,7 @@ def CNN(features_train, labels_train, features_val, labels_val):
 	accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 	print("TRAINING STARTED")
 	# Training: 1000 iterations
-	for step in range(10000):
+	for step in range(200):
 		#Select a new batch
 		batch = random.sample(group_train, batch_size)
 		unzipped_batch = list(zip(*batch))
@@ -55,10 +50,10 @@ def CNN(features_train, labels_train, features_val, labels_val):
 			#print('Loss at step %d: %f' % (step, cross_entropy.))
 			print('Training accuracy: ' + str(accuracy.eval(feed_dict={x: features_train, y_: labels_train})))
 			print('Test accuracy: ' + str(accuracy.eval(feed_dict={x: features_val, y_: labels_val})))
-			#print(y[:3])
-			print(sess.run(y, feed_dict={x: features_val})[:3])
-			print(labels_val[:3])
+			#print(sess.run(y, feed_dict={x: features_val})[:3])
+			#print(labels_val[:3])
 
+	return sess.run(y, feed_dict={x: features_test})
 	#correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
 	#accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 	#print(accuracy.eval(feed_dict={x: features, y_: labels}))
