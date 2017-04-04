@@ -22,8 +22,8 @@ def readImages(directory):
 		#Add label to label list
 		labels_train.append(label_one_hot)
 
-	features_val = features_train[:3000]
-	features_train = features_train[3000:]
-	labels_val = labels_train[:3000]
-	labels_train = labels_train[3000:]
+	features_val = features_train[3770:]
+	features_train = features_train[:3770]
+	labels_val = labels_train[3770:]
+	labels_train = labels_train[:3770]
 	return features_train, labels_train, features_val, labels_val

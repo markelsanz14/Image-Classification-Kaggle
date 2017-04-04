@@ -12,7 +12,10 @@ def main():
 
 	path_to_test_images = '../NewImagesTest/'
 	features_test, nameList = rts.readImages(path_to_test_images)
-	predictions = reg.CNN(features_train, labels_train, features_val, labels_val, features_test)
+	# Uncomment to execute Regression
+	#predictions = reg.CNN(features_train, labels_train, features_val, labels_val, features_test)
+	# Uncomment to execute Deep Convolutional Neural Network
+	predictions = cnn.CNN(features_train, labels_train, features_val, labels_val, features_test)
 
 	wrpr.writePrediction(predictions, nameList)
 
