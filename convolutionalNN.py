@@ -15,7 +15,7 @@ def conv2d(x, W):
 	return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
 def max_pool_2x2(x):
-	return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+	return tf.nn.max_pool(x, ksize=[1, 4, 4, 1], strides=[1, 4, 4, 1], padding='SAME')
 
 
 def CNN(features_train, labels_train, features_val, labels_val, features_test):
@@ -36,7 +36,7 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 
 	h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 	h_pool1 = max_pool_2x2(h_conv1)
-	# Pooling: the size of the images will be reduced to 128x128
+	# Pooling: the size of the images will be reduced to 64x64
 
 
 	# Second convolutional layer
@@ -45,15 +45,15 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 
 	h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
 	h_pool2 = max_pool_2x2(h_conv2)
-	# Pooling: the size of the images will be reduced to 64x64
+	# Pooling: the size of the images will be reduced to 16x16
 
 
 	# Fully connected layer
 	# 64 filters of 64x64 and 1024 neurons
-	W_fc1 = weight_variable([64*64*64, 1024])
+	W_fc1 = weight_variable([64*16*16, 1024])
 	b_fc1 = bias_variable([1024])
 
-	h_pool2_flat = tf.reshape(h_pool2, [-1, 64*64*64])
+	h_pool2_flat = tf.reshape(h_pool2, [-1, 64*16*16])
 	h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 
@@ -68,6 +68,7 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 
 	y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
+	train_prediction = tf.nn.softmax(y_conv)
 
 	print(len(features_train))
 	print(len(labels_train))
@@ -81,7 +82,7 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 	print("TRAINING STARTED")
 
 	group_train = list(zip(features_train, labels_train))
-	batch_size = 3
+	batch_size = 10
 
 	# Loss function
 	cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
@@ -100,22 +101,49 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 
 	print("TRAIN")
 	# Training: 10000 iterations
-	for step in range(140):
-		if step < 100:
-			print("Step: " + str(step))
+	for step in range(12000):
+		#if step < 100:
+		#	print("Step: " + str(step))
 		#Select a new batch
 		batch = random.sample(group_train, batch_size)
 		batch_x, batch_y = list(zip(*batch))
+
+		if step % 100 == 0:
+			train_accuracy = accuracy.eval(feed_dict={x: batch_x, y_: batch_y, keep_prob: 1.0})
+			print("step %d, validation accuracy %g"%(step, train_accuracy))
 		
 		#Train on batch
 		train_data = {x : batch_x, y_: batch_y, keep_prob: 0.5}
 		#Run one more step of gradient descent
 		train_step.run(feed_dict=train_data)
-		if step % 100 == 10:
-			train_accuracy = accuracy.eval(feed_dict={x: features_val, y_: labels_val, keep_prob: 1.0})
-			print("step %d, validation accuracy %g"%(step, train_accuracy))
 	
 
-	print('Test accuracy: %g'%accuracy.eval(feed_dict={x: features_val, y_: labels_val, keep_prob: 1.0}))
+	#print('Test accuracy: %g'%accuracy.eval(feed_dict={x: features_val, y_: labels_val, keep_prob: 1.0}))
 
-	return sess.run(y_conv, feed_dict={x: features_test})
+	# Predict on test data
+	predictions = []
+	for i in range(100):
+		#feat1 = features_test[2*i]
+		#feat1_f = map(lambda x: float(x), feat1)
+		#feat2 = features_test[2*1+1]
+		#feat2_f = map(lambda x: float(x), feat2)
+		#feat = [feat1, feat2]
+		
+		#new_feat = np.reshape(feat, (-1))
+		#feat_float = tf.cast(new_feat, tf.float32)
+		feat = features_test[10*i: 10*i+10]
+		d = {x: feat, keep_prob: 1.0}
+		pred = sess.run(train_prediction, feed_dict=d)
+		#print(len(pred))
+		for j in range(len(pred)):
+			predictions.append(pred[j])
+		#print(i)
+
+	print(predictions[0])
+	return predictions
+
+
+#return sess.run(y_conv, feed_dict={x: features_test})
+
+
+
