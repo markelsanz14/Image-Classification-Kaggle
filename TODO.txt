@@ -1,0 +1,6 @@
+TODO List:
+
+- Read all hyperparameters from a separate file, instead of hard-coding them.
+- RGB color NN support
+- Run on bigger server with a GPU, for faster training and bigger NN.
+
