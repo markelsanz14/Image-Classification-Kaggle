@@ -151,7 +151,8 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 		feat = features_test[3*i:3*i+3]
 		d = {x: feat, keep_prob: 1.0}
 		pred = sess.run(train_prediction, feed_dict= d)
-		predictions.append(pred[0])
+		for j in range(len(feat)):
+			predictions.append(pred[j])
 		if i % 1000 == 0:
 			print("step " + str(i))
 	return predictions
