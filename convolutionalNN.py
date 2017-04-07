@@ -101,7 +101,7 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 
 	print("TRAIN")
 	# Training: 10000 iterations
-	for step in range(1000):
+	for step in range(110):
 		#if step < 100:
 		#	print("Step: " + str(step))
 		#Select a new batch
@@ -119,32 +119,17 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 		train_step.run(feed_dict=train_data)
 	
 
-	print('Test accuracy: %g'%accuracy.eval(feed_dict={x: features_val, y_: labels_val, keep_prob: 1.0}))
+	print('Validation accuracy: %g'%accuracy.eval(feed_dict={x: features_val, y_: labels_val, keep_prob: 1.0}))
 
 	# Predict on test data
 	predictions = []
-	for i in range(100):
-		#feat1 = features_test[2*i]
-		#feat1_f = map(lambda x: float(x), feat1)
-		#feat2 = features_test[2*1+1]
-		#feat2_f = map(lambda x: float(x), feat2)
-		#feat = [feat1, feat2]
-		
-		#new_feat = np.reshape(feat, (-1))
-		#feat_float = tf.cast(new_feat, tf.float32)
-		feat = features_test[10*i: 10*i+10]
+	for i in range(4051):
+		feat = features_test[3*i:3*i+3]
 		d = {x: feat, keep_prob: 1.0}
-		pred = sess.run(train_prediction, feed_dict=d)
-		#print(len(pred))
-		for j in range(len(pred)):
-			predictions.append(pred[j])
-		#print(i)
-
-	print(predictions[0])
+		pred = sess.run(train_prediction, feed_dict= d)
+		predictions.append(pred[0])
+		if i % 1000 == 0:
+			print("step " + str(i))
 	return predictions
-
-
-#return sess.run(y_conv, feed_dict={x: features_test})
-
 
 

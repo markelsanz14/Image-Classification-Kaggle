@@ -15,8 +15,6 @@ def readImages(directory):
 		image = Image.open(directory+im)
 		#Read label from image (label = first character of image name)
 		label = int(im[0])
-		if i > 3700:
-			print(label)
 		label_one_hot = ident[label]
 		#Read image pixels and store them as an array
 		image_pixels = np.asarray(image.getdata()).reshape((image.size[1]*image.size[1]))
