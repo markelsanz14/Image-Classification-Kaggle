@@ -15,7 +15,7 @@ def conv2d(x, W):
 	return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
 def max_pool_2x2(x):
-	return tf.nn.max_pool(x, ksize=[1, 4, 4, 1], strides=[1, 4, 4, 1], padding='SAME')
+	return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
 def CNN(features_train, labels_train, features_val, labels_val, features_test):
@@ -36,7 +36,7 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 
 	h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 	h_pool1 = max_pool_2x2(h_conv1)
-	# Pooling: the size of the images will be reduced to 64x64
+	# Pooling: the size of the images will be reduced to 128*128
 
 
 	# Second convolutional layer
@@ -45,16 +45,34 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 
 	h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
 	h_pool2 = max_pool_2x2(h_conv2)
-	# Pooling: the size of the images will be reduced to 16x16
+	# Pooling: the size of the images will be reduced to 64*64
+
+
+	# Third convolutional layer
+	W_conv3 = weight_variable([5, 5, 128, 256])
+	b_conv3 = bias_variable([256])
+
+	h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+	h_pool3 = max_pool_2x2(h_conv3)
+	# Pooling: the size of the images will be reduced to 32*32
+
+
+	# Fourth convolutional layer
+	W_conv4 = weight_variable([5, 5, 256, 256])
+	b_conv4 = bias_variable([256])
+
+	h_conv4 = tf.nn.relu(conv2d(h_pool3, W_conv4) + b_conv4)
+	h_pool4 = max_pool_2x2(h_conv4)
+	# Pooling: the size of the images will be reduced to 16*16
 
 
 	# Fully connected layer
-	# 64 filters of 64x64 and 1024 neurons
-	W_fc1 = weight_variable([128*16*16, 1024])
+	# 256 filters of 16*16 and 1024 neurons
+	W_fc1 = weight_variable([256*16*16, 1024])
 	b_fc1 = bias_variable([1024])
 
-	h_pool2_flat = tf.reshape(h_pool2, [-1, 128*16*16])
-	h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+	h_pool4_flat = tf.reshape(h_pool4, [-1, 256*16*16])
+	h_fc1 = tf.nn.relu(tf.matmul(h_pool4_flat, W_fc1) + b_fc1)
 
 
 	# Apply Dropout with probability keep_prob
@@ -86,8 +104,9 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 
 	# Loss function
 	cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
-	# Training step
-	train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+	# Training step with decay in learning rate
+	learning_rate = tf.placeholder(tf.float32, shape=[]) 
+	train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cross_entropy)
 
 	correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
 	accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -112,9 +131,14 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 			train_accuracy = accuracy.eval(feed_dict={x: batch_x, y_: batch_y, keep_prob: 1.0})
 			print("step %d, training set accuracy %g"%(step, train_accuracy))
 			print("Validation set accuracy %g"%accuracy.eval(feed_dict={x: features_val, y_: labels_val, keep_prob: 1.0}))
-	
+
+		# Update learning rate	
+		if step != 0:
+			learning_r = (float(1) / step)
+		else:
+			learning_r = 0.6
 		#Train on batch
-		train_data = {x : batch_x, y_: batch_y, keep_prob: 0.5}
+		train_data = {x : batch_x, y_: batch_y, keep_prob: 0.5, learning_rate: learning_r}
 		#Run one more step of gradient descent
 		train_step.run(feed_dict=train_data)
 	
