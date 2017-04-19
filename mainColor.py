@@ -3,6 +3,7 @@ import readTestImagesColor as rts
 import convolutionalNNColor as cnn
 #import regression as reg
 import writePredictionColor as wrpr
+import matplotlib.pyplot as plt
 
 #
 def main():
@@ -12,12 +13,14 @@ def main():
 
 	path_to_test_images = '../NewImagesColorTest/'
 	#features_test, nameList = rts.readImages(path_to_test_images)
-	# Uncomment to execute Regression
-	#predictions = reg.CNN(features_train, labels_train, features_val, labels_val, features_test)
+
 	# Uncomment to execute Deep Convolutional Neural Network
 	accuracies, steps = cnn.CNN(features_train, labels_train, features_val, labels_val)
 
-	#wrpr.writePrediction(predictions, nameList)
+	plt.plot(steps, accuracies)
+	plt.ylabel('Accuracy RGB')
+	plt.xlabel('Training Step Number')
+	plt.savefig('../figure_rgb')
 
 
 if __name__ == "__main__":

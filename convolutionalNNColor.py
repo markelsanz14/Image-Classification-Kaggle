@@ -18,7 +18,7 @@ def max_pool_2x2(x):
 	return tf.nn.max_pool(x, ksize=[1, 4, 4, 1], strides=[1, 4, 4, 1], padding='SAME')
 
 
-def CNN(features_train, labels_train, features_val, labels_val, features_test):
+def CNN(features_train, labels_train, features_val, labels_val):
 
 	# DEFINING THE PARAMETERS OF THE NETWORK
 	print("CREATING NETWORK")	
@@ -147,7 +147,6 @@ def CNN(features_train, labels_train, features_val, labels_val, features_test):
 	return predictions
 	'''
 
-	return 
-
+	return val_accuracies, val_steps
 
 

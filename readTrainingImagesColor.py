@@ -25,8 +25,8 @@ def readImages(directory):
 			print(len(image_pixels))
 		a = False
 
-	features_val = features_train[3777:]
-	features_train = features_train[:3777]
-	labels_val = labels_train[3777:]
-	labels_train = labels_train[:3777]
+	features_val = features_train[3700:]
+	features_train = features_train[:3700]
+	labels_val = labels_train[3700:]
+	labels_train = labels_train[:3700]
 	return features_train, labels_train, features_val, labels_val

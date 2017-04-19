@@ -4,13 +4,13 @@ import convolutionalNN as cnn
 import regression as reg
 import writePrediction as wrpr
 import matplotlib.pyplot as plt
+import numpy as np
 
 #
 def main():
 	path_to_train_images = '../NewImages/'
 	features_train, labels_train, features_val, labels_val = rtr.readImages(path_to_train_images)
 	print("TRAINING SET READ")
-
 	path_to_test_images = '../NewImagesTest2/'
 	#features_test, nameList = rts.readImages(path_to_test_images)
 	# Deep Convolutional Neural Network
