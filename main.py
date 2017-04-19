@@ -3,6 +3,7 @@ import readTestImages as rts
 import convolutionalNN as cnn
 import regression as reg
 import writePrediction as wrpr
+import matplotlib.pyplot as plt
 
 #
 def main():
@@ -11,13 +12,15 @@ def main():
 	print("TRAINING SET READ")
 
 	path_to_test_images = '../NewImagesTest2/'
-	features_test, nameList = rts.readImages(path_to_test_images)
-	# Uncomment to execute Regression
-	#predictions = reg.CNN(features_train, labels_train, features_val, labels_val, features_test)
-	# Uncomment to execute Deep Convolutional Neural Network
-	predictions = cnn.CNN(features_train, labels_train, features_val, labels_val, features_test)
+	#features_test, nameList = rts.readImages(path_to_test_images)
+	# Deep Convolutional Neural Network
+	accuracies, steps = cnn.CNN(features_train, labels_train, features_val, labels_val)
 
-	wrpr.writePrediction(predictions, nameList)
+	plt.plot(steps, accuracies)
+	plt.ylabel('Accuracy')
+	plt.xlabel('Training Step Number')
+	plt.savefig('../figure.png')
+	#wrpr.writePrediction(predictions, nameList)
 
 
 if __name__ == "__main__":
