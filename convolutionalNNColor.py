@@ -14,7 +14,7 @@ def bias_variable(shape):
 def conv2d(x, W):
 	return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
-def max_pool_2x2(x):
+def max_pool_4x4(x):
 	return tf.nn.max_pool(x, ksize=[1, 4, 4, 1], strides=[1, 4, 4, 1], padding='SAME')
 
 
@@ -35,7 +35,7 @@ def CNN(features_train, labels_train, features_val, labels_val):
 	y_ = tf.placeholder(tf.float32, shape=[None, 8])
 
 	h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-	h_pool1 = max_pool_2x2(h_conv1)
+	h_pool1 = max_pool_4x4(h_conv1)
 	# Pooling: the size of the images will be reduced to 64x64
 
 
@@ -44,7 +44,7 @@ def CNN(features_train, labels_train, features_val, labels_val):
 	b_conv2 = bias_variable([64])
 
 	h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-	h_pool2 = max_pool_2x2(h_conv2)
+	h_pool2 = max_pool_4x4(h_conv2)
 	# Pooling: the size of the images will be reduced to 16x16
 
 
@@ -85,7 +85,8 @@ def CNN(features_train, labels_train, features_val, labels_val):
 	# Loss function
 	cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
 	# Training step
-	train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+	learning_rate = tf.placeholder(tf.float32, shape=[])
+	train_step = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cross_entropy)
 
 	correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
 	accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -102,7 +103,7 @@ def CNN(features_train, labels_train, features_val, labels_val):
 
 	print("TRAIN")
 	# Training: 10000 iterations
-	for step in range(120):
+	for step in range(10000):
 		#Select a new batch
 		batch = random.sample(group_train, batch_size)
 		batch_x, batch_y = list(zip(*batch))
@@ -114,8 +115,12 @@ def CNN(features_train, labels_train, features_val, labels_val):
 			val_accuracies.append(val_accuracy)
 			val_steps.append(step)
 
+		if step < 3000:
+			learning_r = 1e-4
+		else:
+			learning_r = (0.1 / step)
 		#Train on batch
-		train_data = {x : batch_x, y_: batch_y, keep_prob: 0.5}
+		train_data = {x : batch_x, y_: batch_y, keep_prob: 0.5, learning_rate: learning_r}
 		#Run one more step of gradient descent
 		train_step.run(feed_dict=train_data)
 	
