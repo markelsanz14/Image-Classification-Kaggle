@@ -1,4 +1,4 @@
-# ALDA-project
+# Kaggle Image Classification
 Image classification problem from Kaggle. Classify 8 different types of fish images.
 Solution uses Convolutional Neural Networks.
 
